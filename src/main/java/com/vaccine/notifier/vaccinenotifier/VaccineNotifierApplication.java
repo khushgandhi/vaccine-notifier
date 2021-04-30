@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class VaccineNotifierApplication {
 
 	public static void main(String[] args) {
+		//
 		SpringApplication.run(VaccineNotifierApplication.class, args);
 	}
 
