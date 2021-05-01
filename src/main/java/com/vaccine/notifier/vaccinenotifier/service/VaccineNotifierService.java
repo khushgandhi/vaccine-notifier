@@ -4,7 +4,6 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,15 +38,15 @@ class DistrictResponse
 @Service
 public class VaccineNotifierService {
 
-	@Value("${cowin.district.endpoint}")
-	private String cowinDistrictUrl;
+	@Value("${cowin.centerByDistrict.endpoint}")
+	private String cowinCenterByDistrictUrl;
 	
 	
-	public List<Center> getNextAvailableSlots(Integer districtId,Integer minAge) throws URISyntaxException
+	public List<Center> getNextAvailableSlots(Long districtId,Integer minAge) throws URISyntaxException
 	{
 		Map<String,Center> centersMap = new LinkedHashMap<>();
 		
-		for(int i=0;i<8;i++)
+		for(int i=0;i<1;i++)
 		{
 			List<Center> allCenters = this.getCenters(districtId,i*7);
 			
@@ -92,11 +91,11 @@ public class VaccineNotifierService {
 		
 	}
 
-	private List<Center> getCenters(Integer districtId,Integer offset) throws URISyntaxException
+	private List<Center> getCenters(Long districtId,Integer offset) throws URISyntaxException
 	{
 		String date = getDateWithOffset(offset);
 		RestTemplate restTemplate = new RestTemplate();
-		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(cowinDistrictUrl)
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(cowinCenterByDistrictUrl)
 				.queryParam("district_id", districtId)
 				.queryParam("date",date);
 		

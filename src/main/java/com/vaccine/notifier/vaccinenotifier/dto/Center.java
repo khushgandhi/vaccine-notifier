@@ -1,7 +1,6 @@
 package com.vaccine.notifier.vaccinenotifier.dto;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -102,5 +101,14 @@ public class Center {
 	public void setSessions(List<Session> sessions) {
 		this.sessions = sessions;
 	}
+	@Override
+	public String toString() {
+		return "Center [centerId=" + centerId + ", name=" + name + ", stateName=" + stateName + ", districtName="
+				+ districtName + ", blockName=" + blockName + ", pincode=" + pincode + ", latitude=" + latitude
+				+ ", longitude=" + longitude + ", from=" + from + ", to=" + to + ", feeType=" + feeType + ", sessions="
+				+ sessions + "]";
+	}
+	
+	
 	
 }
