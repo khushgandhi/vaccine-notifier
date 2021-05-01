@@ -1,0 +1,20 @@
+version : '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./app.dockerfile      
+    container_name: vendor-rapidprint
+    ports:
+      - 9090:8080   
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: 7DrjVvP2HxXbr4Sm
+      MYSQL_DATABASE: rapid-print
+      JWT_KEY: 9w7rvFb808Pr9yLRZ79rpzDljwBFER5rg1XUsDQWgh4gbhVwWK5YgWxgc8qhvVy8
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "500k"
+        max-file: "10"
+
