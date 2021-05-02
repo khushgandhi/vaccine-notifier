@@ -27,7 +27,11 @@ public class VaccineNotifierApplication {
 
 	@Bean
 	JedisConnectionFactory jedisConnectionFactory() {
-	    return new JedisConnectionFactory();
+	    JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
+	    jedisConnectionFactory.getPoolConfig().setMaxIdle(30);
+	    jedisConnectionFactory.getPoolConfig().setMinIdle(10);
+	    
+	    return jedisConnectionFactory;
 	}
 
 	@Bean
