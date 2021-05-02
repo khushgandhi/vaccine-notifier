@@ -10,6 +10,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -23,13 +24,19 @@ import com.vaccine.notifier.vaccinenotifier.dto.Center;
 @EnableScheduling
 public class VaccineNotifierApplication {
 
+	@Value("${spring.redis.host}")
+	private String redisHost;
+	@Value("${spring.redis.port}")
+	private int port;
+	
 	public static void main(String[] args) {
 		SpringApplication.run(VaccineNotifierApplication.class, args);
 	}
 
 	@Bean
 	JedisConnectionFactory jedisConnectionFactory() {
-	    JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
+		 RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, port);
+	    JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
 	    jedisConnectionFactory.getPoolConfig().setMaxIdle(30);
 	    jedisConnectionFactory.getPoolConfig().setMinIdle(10);
 	    
