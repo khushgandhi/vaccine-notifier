@@ -16,8 +16,14 @@ public class SubscriberService {
 
 	@Autowired
 	SubscriberRepository subscriberRepo;
-	public static final Pattern VALID_EMAIL_ADDRESS_REGEX = 
+	private static final Pattern VALID_EMAIL_ADDRESS_REGEX = 
 		    Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+	
+	private static String WELCOME_SUB = "Thanks for registering with Vaccine-notifier!";
+	private static String WELCOME_BODY = "<h2>Hey, Covid Warrior</h2> \n<h4>Now no need to worry about finding your vaccination slot.</h4>";
+	
+	@Autowired
+	EmailService emailService;
 	
 	public void addSubscriber(Subscriber sub) throws Exception
 	{
@@ -25,6 +31,14 @@ public class SubscriberService {
 		{
 			sub.setIsActive(true);
 			subscriberRepo.save(sub);
+			try {
+				emailService.sentMail(sub.getEmailId(),WELCOME_SUB , WELCOME_BODY);
+			}
+			catch(Exception ex)
+			{
+				System.out.println("Exception while sending mail in addSubscriber for -:"+sub.getEmailId());
+			}
+			
 		}
 		else
 		{

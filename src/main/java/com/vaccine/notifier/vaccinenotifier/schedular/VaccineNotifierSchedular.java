@@ -9,12 +9,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.MessagingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
@@ -26,6 +29,7 @@ import com.vaccine.notifier.vaccinenotifier.dto.District;
 import com.vaccine.notifier.vaccinenotifier.dto.State;
 import com.vaccine.notifier.vaccinenotifier.model.Subscriber;
 import com.vaccine.notifier.vaccinenotifier.repository.SubscriberRepository;
+import com.vaccine.notifier.vaccinenotifier.service.EmailService;
 import com.vaccine.notifier.vaccinenotifier.service.VaccineNotifierService;
 
 class StateResponse {
@@ -68,9 +72,15 @@ public class VaccineNotifierSchedular {
 	@Value("${cowin.district.endpoint}")
 	private String cowinDistrictEndpoint;
 
-	@Value("${cowin.available.ageslots}")
-	private List<Integer> cowinAvailableAgeSlots;
+	@Value("${vacine-notifier.url}")
+	private String vaccineNotifierUrl;
+	
+	@Autowired
+	EmailService emailService;
+	
+	private static String SLOTS_AVAILABLE_SUB = "Hurry vaccination slots are available near you!!";
 
+	@Scheduled(cron = "${cron.expression}")
 	public void findAvailableCenters() throws ParseException {
 		Date today = getTodayDate();
 		Set<DistinctDistrictAge> districtAgePairs = subscriberRepository.findDistinctDistricts(today);
@@ -96,11 +106,16 @@ public class VaccineNotifierSchedular {
 					Set<Subscriber> subscribers = subscriberRepository.findValidSubscribers(districtId, minAge, today);
 					if (!CollectionUtils.isEmpty(subscribers)) {
 						subscribers.forEach(subscriber -> {
+                             try {
+								this.emailService.sentMail(subscriber.getEmailId(),SLOTS_AVAILABLE_SUB,getSlotAvailableBody(subscriber));
+							} catch (Exception ex) {
+								System.out.println("Exception while sending mail to "+subscriber.getEmailId());
+								System.out.println(ex);
+							}
 
-							// TODO send email
-
-							subscriber.setLastNotifiedAt(new Date());
-							subscriberRepository.save(subscriber);
+                            subscriber.setLastNotifiedAt(new Date());
+   							subscriberRepository.save(subscriber);
+							
 						});
 						
 					}
@@ -181,5 +196,19 @@ public class VaccineNotifierSchedular {
 
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		return formatter.parse(formatter.format(d));
+	}
+	
+	private String getSlotAvailableBody(Subscriber sub)
+	{
+		StringBuilder sb= new StringBuilder("<h3>Hey, Covid Warrior</h3>\n<h4>We found some slots near your area.</h4>\n<h2>please visit below link to get more Info.</h2>");
+	
+//		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(vaccineNotifierUrl)
+//				.queryParam("district_id", sub.getDistrictId())
+//				.queryParam("state_id",sub.getStateId())
+//				.queryParam("minAge", sub.getMinAge());
+		
+		sb.append("\n<a href=\""+vaccineNotifierUrl+"\">"+vaccineNotifierUrl+"</a>");
+         
+		return sb.toString();
 	}
 }

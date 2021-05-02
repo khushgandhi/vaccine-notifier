@@ -10,11 +10,15 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.vaccine.notifier.vaccinenotifier.dto.Center;
 
 @SpringBootApplication
 @EnableCaching
+@EnableAsync
+@EnableScheduling
 public class VaccineNotifierApplication {
 
 	public static void main(String[] args) {
