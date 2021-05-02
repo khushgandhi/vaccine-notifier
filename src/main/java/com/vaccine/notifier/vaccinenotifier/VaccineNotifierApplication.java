@@ -1,9 +1,11 @@
 package com.vaccine.notifier.vaccinenotifier;
 
+import java.io.ObjectInputFilter.Config;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
@@ -31,12 +33,14 @@ public class VaccineNotifierApplication {
 	    jedisConnectionFactory.getPoolConfig().setMaxIdle(30);
 	    jedisConnectionFactory.getPoolConfig().setMinIdle(10);
 	    
+	    System.out.println("-------->"+jedisConnectionFactory.getHostName());
 	    return jedisConnectionFactory;
 	}
 
 	@Bean
 	public RedisTemplate<String, Center> redisTemplate() {
 	    RedisTemplate<String, Center> template = new RedisTemplate<>();
+	    template.setEnableTransactionSupport(true);
 	    template.setConnectionFactory(jedisConnectionFactory());
 	    return template;
 	}
