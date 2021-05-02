@@ -1,6 +1,5 @@
 package com.vaccine.notifier.vaccinenotifier;
 
-import java.io.ObjectInputFilter.Config;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
