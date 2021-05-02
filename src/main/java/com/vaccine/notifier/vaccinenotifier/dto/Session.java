@@ -1,10 +1,13 @@
 package com.vaccine.notifier.vaccinenotifier.dto;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-public class Session {
-	
+public class Session implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 	@JsonProperty("session_id")
 	private String sessionId;
 	private String date;

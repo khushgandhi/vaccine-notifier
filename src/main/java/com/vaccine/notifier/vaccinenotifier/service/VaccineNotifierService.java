@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.vaccine.notifier.vaccinenotifier.dto.Center;
 import com.vaccine.notifier.vaccinenotifier.dto.Session;
+import com.vaccine.notifier.vaccinenotifier.utill.CacheRepository;
 
 class DistrictResponse
 {
@@ -40,15 +42,36 @@ public class VaccineNotifierService {
 
 	@Value("${cowin.centerByDistrict.endpoint}")
 	private String cowinCenterByDistrictUrl;
-	
+
+	@Autowired
+	CacheRepository cacheRepo;
 	
 	public List<Center> getNextAvailableSlots(Long districtId,Integer minAge) throws URISyntaxException
 	{
+		String ageKey = districtId.toString()+"_"+minAge;
+		if(this.cacheRepo.contains(ageKey))
+		{
+			return this.cacheRepo.find(ageKey);
+		}
+		
 		Map<String,Center> centersMap = new LinkedHashMap<>();
 		
-		for(int i=0;i<1;i++)
+		for(int i=0;i<8;i++)
 		{
-			List<Center> allCenters = this.getCenters(districtId,i*7);
+			String date = getDateWithOffset(i*7);
+			
+			String dateKey = districtId.toString()+"_"+date;
+			List<Center> allCenters = new ArrayList<>();
+			
+			if(this.cacheRepo.contains(dateKey))
+			{
+				allCenters = this.cacheRepo.find(dateKey);
+			}
+			else
+			{
+				allCenters = this.getCenters(districtId,date);
+				this.cacheRepo.save(dateKey, allCenters);
+			}
 			
 			allCenters.stream().forEach(center->{
 				
@@ -74,6 +97,7 @@ public class VaccineNotifierService {
 		}
 		
 		List<Center> filterdCenters = new ArrayList<>(centersMap.values());
+		this.cacheRepo.save(ageKey, filterdCenters);
 		return filterdCenters;
 	}
 	
@@ -91,9 +115,9 @@ public class VaccineNotifierService {
 		
 	}
 
-	private List<Center> getCenters(Long districtId,Integer offset) throws URISyntaxException
+	
+	private List<Center> getCenters(Long districtId,String date) throws URISyntaxException
 	{
-		String date = getDateWithOffset(offset);
 		RestTemplate restTemplate = new RestTemplate();
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(cowinCenterByDistrictUrl)
 				.queryParam("district_id", districtId)
