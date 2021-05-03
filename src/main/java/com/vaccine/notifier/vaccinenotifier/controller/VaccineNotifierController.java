@@ -47,7 +47,7 @@ public class VaccineNotifierController {
 		subscriberService.addSubscriber(subscriber);	
 	}
 	
-	@RequestMapping(value="/deleteSubscriber",method={RequestMethod.OPTIONS,RequestMethod.DELETE})
+	@RequestMapping(value="/deleteSubscriber",method={RequestMethod.OPTIONS,RequestMethod.POST})
 	public void deleteSubscriber(@RequestBody Subscriber subscriber) throws Exception
 	{
 		subscriberService.deleteSubscriber(subscriber);
