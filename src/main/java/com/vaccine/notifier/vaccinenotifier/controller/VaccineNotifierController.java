@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vaccine.notifier.vaccinenotifier.dto.Center;
+import com.vaccine.notifier.vaccinenotifier.dto.SubscriberResponse;
 import com.vaccine.notifier.vaccinenotifier.model.Subscriber;
 import com.vaccine.notifier.vaccinenotifier.schedular.VaccineNotifierSchedular;
 import com.vaccine.notifier.vaccinenotifier.service.SubscriberService;
@@ -42,17 +43,15 @@ public class VaccineNotifierController {
 	}
 	
 	@RequestMapping(value="/addSubscriber",method={RequestMethod.OPTIONS,RequestMethod.POST})
-	public String addSubscriber(@RequestBody Subscriber subscriber) throws Exception
+	public SubscriberResponse addSubscriber(@RequestBody Subscriber subscriber) throws Exception
 	{
-		subscriberService.addSubscriber(subscriber);	
-		return "Subscriber Added Succesfuly";
+		return subscriberService.addSubscriber(subscriber);	
 	}
 	
 	@RequestMapping(value="/deleteSubscriber",method={RequestMethod.OPTIONS,RequestMethod.POST})
-	public String deleteSubscriber(@RequestBody Subscriber subscriber) throws Exception
+	public SubscriberResponse deleteSubscriber(@RequestBody Subscriber subscriber) throws Exception
 	{
-		subscriberService.deleteSubscriber(subscriber);
-		return "Subscriber Deleted Succesfuly";
+		return subscriberService.deleteSubscriber(subscriber);
 	}
 	
 	

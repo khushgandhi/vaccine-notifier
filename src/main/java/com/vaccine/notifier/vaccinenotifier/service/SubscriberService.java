@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vaccine.notifier.vaccinenotifier.config.MailTemplate;
+import com.vaccine.notifier.vaccinenotifier.dto.SubscriberResponse;
 import com.vaccine.notifier.vaccinenotifier.model.Subscriber;
 import com.vaccine.notifier.vaccinenotifier.repository.SubscriberRepository;
 
@@ -17,55 +18,50 @@ public class SubscriberService {
 
 	@Autowired
 	SubscriberRepository subscriberRepo;
-	private static final Pattern VALID_EMAIL_ADDRESS_REGEX = 
-		    Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-	
+	private static final Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern
+			.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
 	private static String WELCOME_SUB = "Thanks for registering with Vaccine-notifier!";
-	private static String WELCOME_BODY = "<h2>Hey, Covid Warrior</h2> \n<h4>Now no need to worry about finding your vaccination slot.</h4>";
-	
+
 	@Autowired
 	EmailService emailService;
-	
-	public void addSubscriber(Subscriber sub) throws Exception
-	{
-		if(sub!=null && validateSubscriber(sub))
-		{
+
+	public SubscriberResponse addSubscriber(Subscriber sub) throws Exception {
+		if (sub != null && validateSubscriber(sub)) {
 			sub.setIsActive(true);
 			subscriberRepo.save(sub);
 			try {
-				emailService.sentMail(sub.getEmailId(),WELCOME_SUB , MailTemplate.WELCOME_SUBSCRIBER);
+				emailService.sentMail(sub.getEmailId(), WELCOME_SUB, MailTemplate.WELCOME_SUBSCRIBER);
+			} catch (Exception ex) {
+				System.out.println("Exception while sending mail in addSubscriber for -:" + sub.getEmailId());
 			}
-			catch(Exception ex)
-			{
-				System.out.println("Exception while sending mail in addSubscriber for -:"+sub.getEmailId());
-			}
-			
-		}
-		else
-		{
+
+		} else {
 			System.out.println("Invalid subscriber");
 			throw new Exception("Invalid Suvbscriber");
 		}
+		
+		return new SubscriberResponse("Network call na jo , vaccine lagay..");
 	}
-	
-	public void deleteSubscriber(Subscriber sub)
-	{
+
+	public SubscriberResponse deleteSubscriber(Subscriber sub) {
 		Optional<Subscriber> subOptional = subscriberRepo.findById(sub.getEmailId());
-		if(sub.getEmailId()!=null && subOptional.isPresent() )
-		{
+		if (sub.getEmailId() != null && subOptional.isPresent()) {
 			sub = subOptional.get();
 			sub.setIsActive(false);
 			subscriberRepo.save(sub);
 		}
+		
+		return new SubscriberResponse("Network call na jo , vaccine lagay..");
 	}
-	private boolean validateSubscriber(Subscriber sub)
-	{
+
+	private boolean validateSubscriber(Subscriber sub) {
 		Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(sub.getEmailId());
-		if(sub.getEmailId()==null || sub.getDistrictId() ==null || sub.getMinAge() == null || sub.getDistrictId()<=0 || sub.getMinAge()<=0 || !matcher.find())
-		{
+		if (sub.getEmailId() == null || sub.getDistrictId() == null || sub.getMinAge() == null
+				|| sub.getDistrictId() <= 0 || sub.getMinAge() <= 0 || !matcher.find()) {
 			return false;
 		}
-		
+
 		return true;
 	}
 }
