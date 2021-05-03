@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.vaccine.notifier.vaccinenotifier.config.MailTemplate;
 import com.vaccine.notifier.vaccinenotifier.model.Subscriber;
 import com.vaccine.notifier.vaccinenotifier.repository.SubscriberRepository;
 
@@ -32,7 +33,7 @@ public class SubscriberService {
 			sub.setIsActive(true);
 			subscriberRepo.save(sub);
 			try {
-				emailService.sentMail(sub.getEmailId(),WELCOME_SUB , WELCOME_BODY);
+				emailService.sentMail(sub.getEmailId(),WELCOME_SUB , MailTemplate.WELCOME_SUBSCRIBER);
 			}
 			catch(Exception ex)
 			{

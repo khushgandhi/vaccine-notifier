@@ -42,15 +42,17 @@ public class VaccineNotifierController {
 	}
 	
 	@RequestMapping(value="/addSubscriber",method={RequestMethod.OPTIONS,RequestMethod.POST})
-	public void addSubscriber(@RequestBody Subscriber subscriber) throws Exception
+	public String addSubscriber(@RequestBody Subscriber subscriber) throws Exception
 	{
 		subscriberService.addSubscriber(subscriber);	
+		return "Subscriber Added Succesfuly";
 	}
 	
 	@RequestMapping(value="/deleteSubscriber",method={RequestMethod.OPTIONS,RequestMethod.POST})
-	public void deleteSubscriber(@RequestBody Subscriber subscriber) throws Exception
+	public String deleteSubscriber(@RequestBody Subscriber subscriber) throws Exception
 	{
 		subscriberService.deleteSubscriber(subscriber);
+		return "Subscriber Deleted Succesfuly";
 	}
 	
 	

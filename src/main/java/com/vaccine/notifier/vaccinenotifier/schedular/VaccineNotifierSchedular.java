@@ -9,8 +9,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.mail.MessagingException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -23,6 +21,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.vaccine.notifier.vaccinenotifier.config.MailTemplate;
 import com.vaccine.notifier.vaccinenotifier.dto.Center;
 import com.vaccine.notifier.vaccinenotifier.dto.DistinctDistrictAge;
 import com.vaccine.notifier.vaccinenotifier.dto.District;
@@ -102,12 +101,13 @@ public class VaccineNotifierSchedular {
 				}
 				
 				if (!CollectionUtils.isEmpty(centers)) {
-					System.out.println(districtId + " " + minAge + " " + centers.size());
+					int size = centers.size();
+					System.out.println(districtId + " " + minAge + " " + size);
 					Set<Subscriber> subscribers = subscriberRepository.findValidSubscribers(districtId, minAge, today);
 					if (!CollectionUtils.isEmpty(subscribers)) {
 						subscribers.forEach(subscriber -> {
                              try {
-								this.emailService.sentMail(subscriber.getEmailId(),SLOTS_AVAILABLE_SUB,getSlotAvailableBody(subscriber));
+								this.emailService.sentMail(subscriber.getEmailId(),SLOTS_AVAILABLE_SUB,MailTemplate.getSlotsAvailableMsg(size, getSlotAvailableUrl(subscriber)));
 							} catch (Exception ex) {
 								System.out.println("Exception while sending mail to "+subscriber.getEmailId());
 								System.out.println(ex);
@@ -198,17 +198,17 @@ public class VaccineNotifierSchedular {
 		return formatter.parse(formatter.format(d));
 	}
 	
-	private String getSlotAvailableBody(Subscriber sub)
+	private String getSlotAvailableUrl(Subscriber sub)
 	{
-		StringBuilder sb= new StringBuilder("<h3>Hey, Covid Warrior</h3>\n<h4>We found some slots near your area.</h4>\n<h2>please visit below link to get more Info.</h2>");
+//		StringBuilder sb= new StringBuilder("<h3>Hey, Covid Warrior</h3>\n<h4>We found some slots near your area.</h4>\n<h2>please visit below link to get more Info.</h2>");
 	
 //		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(vaccineNotifierUrl)
 //				.queryParam("district_id", sub.getDistrictId())
 //				.queryParam("state_id",sub.getStateId())
 //				.queryParam("minAge", sub.getMinAge());
 		
-		sb.append("\n<a href=\""+vaccineNotifierUrl+"\">"+vaccineNotifierUrl+"</a>");
+//		sb.append("\n<a href=\""+vaccineNotifierUrl+"\">"+vaccineNotifierUrl+"</a>");
          
-		return sb.toString();
+		return vaccineNotifierUrl.toString();
 	}
 }

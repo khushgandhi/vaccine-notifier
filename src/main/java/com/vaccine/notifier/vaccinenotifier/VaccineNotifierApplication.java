@@ -35,11 +35,13 @@ public class VaccineNotifierApplication {
 	@Bean
 	JedisConnectionFactory jedisConnectionFactory() {
 		 RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, port);
-	    JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
+
+		 JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
 	    jedisConnectionFactory.getPoolConfig().setMaxIdle(30);
 	    jedisConnectionFactory.getPoolConfig().setMinIdle(10);
 	    
 	    System.out.println("-------->"+jedisConnectionFactory.getHostName());
+	    
 	    return jedisConnectionFactory;
 	}
 
