@@ -1,7 +1,5 @@
 package com.vaccine.notifier.vaccinenotifier.config;
 
-import com.vaccine.notifier.vaccinenotifier.model.Subscriber;
-
 public class MailTemplate {
   
 	public final static String WELCOME_SUBSCRIBER = "<table width=\"100%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\">\r\n"
@@ -54,7 +52,7 @@ public class MailTemplate {
 			+ "                        We'll notify you as soon as some vaccination center gets available near you on daily\r\n"
 			+ "                        basis,<br />\r\n"
 			+ "                        And you can also check all the available slots on our website.<br />\r\n"
-			+ "                        <a href=\"www.vaccinenotifier.in\">www.vaccinenotifier.in</a>\r\n"
+			+ "                        <a href=\"https://vaccinenotifier.co.in\">www.vaccinenotifier.co.in</a>\r\n"
 			+ "                     </td>\r\n"
 			+ "                  </tr>\r\n"
 			+ "               </tbody>\r\n"
@@ -85,7 +83,7 @@ public class MailTemplate {
 			+ "                                          <tr>\r\n"
 			+ "                                             <td align=\"center\"\r\n"
 			+ "                                                style=\"font-family: 'Raleway', sans-serif; font-size:20px; color:#f1c40f; line-height:24px; font-weight: bold;\">\r\n"
-			+ "                                                <a href=\"www.vaccinenotifier.in\" style=\"color:#f1c40f\">Want to Unsubscribe?</a>\r\n"
+			+ "                                                <a href=\"https://vaccinenotifier.co.in?unSubscribe=true\" style=\"color:#f1c40f\">Want to Unsubscribe?</a>\r\n"
 			+ "                                             </td>\r\n"
 			+ "                                          </tr>\r\n"
 			+ "                                          <tr>\r\n"
@@ -155,7 +153,7 @@ public class MailTemplate {
 				+ "                  <tr>\r\n"
 				+ "                     <td align=\"center\" style=\"font-family: 'Lato', sans-serif; font-size:14px; color:#757575; line-height:24px; font-weight: 300;\">\r\n"
 				+ "                        Please click on below link to see all the available slots near you.<br>\r\n"
-				+ "                        <a href=\"+"+url+"\">www.vaccinenotifier.in</a>\r\n"
+				+ "                        <a href=\""+url+"\">www.vaccinenotifier.co.in</a>\r\n"
 				+ "                     </td>\r\n"
 				+ "                  </tr>\r\n"
 				+ "               </tbody>\r\n"
@@ -197,7 +195,7 @@ public class MailTemplate {
 				+ "                                                      <tr>\r\n"
 				+ "                                                         <td width=\"10\"></td>\r\n"
 				+ "                                                         <td height=\"30\" align=\"center\" style=\"font-family: 'Lato', sans-serif; font-size:14px; font-weight: 300; color:#2b3c4d;\">\r\n"
-				+ "                                                            <a href=\"#\" style=\"color: #2b3c4d;\">Show Centers</a>\r\n"
+				+ "                                                            <a href=\""+url+"\" style=\"color: #2b3c4d;\">Show Centers</a>\r\n"
 				+ "                                                         </td>\r\n"
 				+ "                                                         <td width=\"10\"></td>\r\n"
 				+ "                                                      </tr>\r\n"
@@ -241,7 +239,7 @@ public class MailTemplate {
 				+ "                                          <tr>\r\n"
 				+ "                                             <td align=\"center\"\r\n"
 				+ "                                                style=\"font-family: 'Raleway', sans-serif; font-size:20px; color:#f1c40f; line-height:24px; font-weight: bold;\">\r\n"
-				+ "                                                <a href=\"www.vaccinenotifier.in\" style=\"color:#f1c40f\">Want to Unsubscribe?</a>\r\n"
+				+ "                                                <a href=\"https://vaccinenotifier.co.in?unSubscribe=true\" style=\"color:#f1c40f\">Want to Unsubscribe?</a>\r\n"
 				+ "                                             </td>\r\n"
 				+ "                                          </tr>\r\n"
 				+ "                                          <tr>\r\n"

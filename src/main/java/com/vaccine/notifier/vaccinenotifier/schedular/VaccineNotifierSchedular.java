@@ -202,13 +202,13 @@ public class VaccineNotifierSchedular {
 	{
 //		StringBuilder sb= new StringBuilder("<h3>Hey, Covid Warrior</h3>\n<h4>We found some slots near your area.</h4>\n<h2>please visit below link to get more Info.</h2>");
 	
-//		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(vaccineNotifierUrl)
-//				.queryParam("district_id", sub.getDistrictId())
-//				.queryParam("state_id",sub.getStateId())
-//				.queryParam("minAge", sub.getMinAge());
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(vaccineNotifierUrl)
+				.queryParam("districtId", sub.getDistrictId())
+				.queryParam("stateId",sub.getStateId())
+				.queryParam("minAge", sub.getMinAge());
 		
 //		sb.append("\n<a href=\""+vaccineNotifierUrl+"\">"+vaccineNotifierUrl+"</a>");
          
-		return vaccineNotifierUrl.toString();
+		return builder.toUriString();
 	}
 }
