@@ -107,7 +107,7 @@ public class VaccineNotifierSchedular {
 					if (!CollectionUtils.isEmpty(subscribers)) {
 						subscribers.forEach(subscriber -> {
                              try {
-								this.emailService.sentMail(subscriber.getEmailId(),SLOTS_AVAILABLE_SUB,MailTemplate.getSlotsAvailableMsg(size, getSlotAvailableUrl(subscriber)));
+								this.emailService.sentMailWhenCenterFound(subscriber.getEmailId(),SLOTS_AVAILABLE_SUB,MailTemplate.getSlotsAvailableMsg(size, getSlotAvailableUrl(subscriber)),subscriber);
 							} catch (Exception ex) {
 								System.out.println("Exception while sending mail to "+subscriber.getEmailId());
 								System.out.println(ex);
@@ -207,7 +207,6 @@ public class VaccineNotifierSchedular {
 				.queryParam("stateId",sub.getStateId())
 				.queryParam("minAge", sub.getMinAge());
 		
-//		sb.append("\n<a href=\""+vaccineNotifierUrl+"\">"+vaccineNotifierUrl+"</a>");
          
 		return builder.toUriString();
 	}
