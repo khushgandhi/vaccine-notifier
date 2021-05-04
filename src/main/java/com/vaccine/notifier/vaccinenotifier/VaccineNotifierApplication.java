@@ -15,12 +15,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import com.vaccine.notifier.vaccinenotifier.dto.Center;
 
 @SpringBootApplication
 @EnableCaching
 @EnableAsync
 @EnableScheduling
+@EnableEncryptableProperties
 public class VaccineNotifierApplication {
 
 	@Value("${spring.redis.host}")
