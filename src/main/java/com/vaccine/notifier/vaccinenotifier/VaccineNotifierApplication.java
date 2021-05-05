@@ -72,6 +72,7 @@ public class VaccineNotifierApplication {
 		SimpleStringPBEConfig config = new SimpleStringPBEConfig();
 
 		config.setPassword(secret);
+		System.out.println("----------->"+secret);
 		config.setAlgorithm("PBEWITHHMACSHA512ANDAES_256");
 	    config.setKeyObtentionIterations("1000");
 	    config.setPoolSize("1");
