@@ -56,7 +56,7 @@ public class VaccineNotifierService {
 		
 		Map<String,Center> centersMap = new LinkedHashMap<>();
 		
-		for(int i=0;i<4;i++)
+		for(int i=0;i<8;i++)
 		{
 			String date = getDateWithOffset(i*7);
 			
