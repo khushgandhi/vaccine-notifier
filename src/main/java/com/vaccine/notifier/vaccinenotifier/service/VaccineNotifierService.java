@@ -125,6 +125,7 @@ public class VaccineNotifierService {
 		
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Content-type", "application/json");
+		headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36 Edg/90.0.818.51");
 		
 		HttpEntity<Object> request = new HttpEntity<>(headers);
 
