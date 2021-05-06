@@ -81,7 +81,13 @@ public class VaccineNotifierSchedular {
 
 	@Scheduled(cron = "${cron.expression}")
 	public void findAvailableCenters() throws ParseException {
+		if(isNightTime())
+		{
+			System.out.println("Cant't send email at night time -:"+ new Date());
+			return;
+		}
 		Date today = getTodayDate();
+		
 		Set<DistinctDistrictAge> districtAgePairs = subscriberRepository.findDistinctDistricts(today);
 
 		if (!CollectionUtils.isEmpty(districtAgePairs)) {
@@ -209,5 +215,14 @@ public class VaccineNotifierSchedular {
 		
          
 		return builder.toUriString();
+	}
+	
+	private boolean isNightTime()
+	{
+		Calendar cal = Calendar.getInstance();
+		
+		int hr = cal.get(Calendar.HOUR_OF_DAY);
+		
+	    return hr<7;
 	}
 }
