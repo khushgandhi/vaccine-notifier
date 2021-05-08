@@ -13,9 +13,9 @@ import com.vaccine.notifier.vaccinenotifier.model.Subscriber;
 @Repository
 public interface SubscriberRepository extends JpaRepository<Subscriber, String>{
 
-	@Query(value="select s.districtId AS districtId,s.minAge AS minAge from Subscriber s where (s.lastNotifiedAt < ?1 or s.lastNotifiedAt is null) and s.isActive=true GROUP BY s.districtId,s.minAge")
-	public Set<DistinctDistrictAge> findDistinctDistricts(Date today);
+	@Query(value="select s.districtId AS districtId,s.minAge AS minAge from Subscriber s where (s.lastNotifiedAt is null or (s.lastNotifiedAt between ?1 and ?2)) and s.isActive=true GROUP BY s.districtId,s.minAge")
+	public Set<DistinctDistrictAge> findDistinctDistricts(Date startDate,Date endDate);
 	
-	@Query(value="select s from Subscriber s where s.districtId = ?1 and s.minAge = ?2 and (s.lastNotifiedAt < ?3 or s.lastNotifiedAt is null) and s.isActive=true")
-	public Set<Subscriber> findValidSubscribers(Long districtId,Integer minAge,Date today);
+	@Query(value="select s from Subscriber s where s.districtId = ?1 and s.minAge = ?2 and (s.lastNotifiedAt is null or (s.lastNotifiedAt between ?3 and ?4)) and s.isActive=true")
+	public Set<Subscriber> findValidSubscribers(Long districtId,Integer minAge,Date startDate,Date endDate);
 }

@@ -74,6 +74,9 @@ public class VaccineNotifierSchedular {
 	@Value("${vacine-notifier.url}")
 	private String vaccineNotifierUrl;
 	
+	@Value("${email.gap}")
+	private int emailGap;
+	
 	@Autowired
 	EmailService emailService;
 	
@@ -86,9 +89,11 @@ public class VaccineNotifierSchedular {
 			System.out.println("Cant't send email at night time -:"+ new Date());
 			return;
 		}
-		Date today = getTodayDate();
 		
-		Set<DistinctDistrictAge> districtAgePairs = subscriberRepository.findDistinctDistricts(today);
+		Date startDate = this.getMinDate();
+		Date endDate = this.getMaxDate();
+		
+		Set<DistinctDistrictAge> districtAgePairs = subscriberRepository.findDistinctDistricts(startDate,endDate);
 
 		if (!CollectionUtils.isEmpty(districtAgePairs)) {
 			districtAgePairs.forEach(districAgePair -> {
@@ -109,7 +114,7 @@ public class VaccineNotifierSchedular {
 				if (!CollectionUtils.isEmpty(centers)) {
 					int size = centers.size();
 					System.out.println(districtId + " " + minAge + " " + size);
-					Set<Subscriber> subscribers = subscriberRepository.findValidSubscribers(districtId, minAge, today);
+					Set<Subscriber> subscribers = subscriberRepository.findValidSubscribers(districtId, minAge, startDate, endDate);
 					if (!CollectionUtils.isEmpty(subscribers)) {
 						subscribers.forEach(subscriber -> {
                              try {
@@ -204,9 +209,25 @@ public class VaccineNotifierSchedular {
 		return formatter.parse(formatter.format(d));
 	}
 	
+	private Date getMaxDate()
+	{
+		Calendar cal = Calendar.getInstance();
+		
+		cal.add(Calendar.HOUR_OF_DAY, -1*emailGap);
+		
+		return cal.getTime();
+		
+	}
+	
+	private  Date getMinDate() {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.YEAR, 2021);
+		cal.set(Calendar.MONTH, 0);
+		cal.set(Calendar.DAY_OF_MONTH, 1);
+		return cal.getTime();
+	}
 	private String getSlotAvailableUrl(Subscriber sub)
 	{
-//		StringBuilder sb= new StringBuilder("<h3>Hey, Covid Warrior</h3>\n<h4>We found some slots near your area.</h4>\n<h2>please visit below link to get more Info.</h2>");
 	
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(vaccineNotifierUrl)
 				.queryParam("districtId", sub.getDistrictId())
