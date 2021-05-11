@@ -1,5 +1,8 @@
 package com.vaccine.notifier.vaccinenotifier.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
@@ -22,18 +25,9 @@ public class EmailService {
 	SubscriberRepository subscriberRepository;
 	
 	@Async
-	public void sentMailWhenCenterFound(String to, String subject, String body,Subscriber sub) throws MessagingException
+	public void sentMailWhenCenterFound(MimeMessage mimeMessage) throws MessagingException
 	{
-		MimeMessage mimeMessage = mailSender.createMimeMessage();
-		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-		helper.setText(body, true);
-		
-		helper.setTo(to);
-        helper.setSubject(subject);
-        
         mailSender.send(mimeMessage);
-        
-        subscriberRepository.save(sub);
 	}
 	
 	@Async
@@ -48,7 +42,6 @@ public class EmailService {
         
         mailSender.send(mimeMessage);
         
-		subscriberRepository.save(sub);
 	}
 	
 }

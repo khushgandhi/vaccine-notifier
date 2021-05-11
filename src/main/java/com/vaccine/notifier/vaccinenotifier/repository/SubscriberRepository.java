@@ -1,6 +1,7 @@
 package com.vaccine.notifier.vaccinenotifier.repository;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,5 +18,5 @@ public interface SubscriberRepository extends JpaRepository<Subscriber, String>{
 	public Set<DistinctDistrictAge> findDistinctDistricts(Date startDate,Date endDate);
 	
 	@Query(value="select s from Subscriber s where s.districtId = ?1 and s.minAge = ?2 and (s.lastNotifiedAt is null or (s.lastNotifiedAt between ?3 and ?4)) and s.isActive=true")
-	public Set<Subscriber> findValidSubscribers(Long districtId,Integer minAge,Date startDate,Date endDate);
+	public List<Subscriber> findValidSubscribers(Long districtId,Integer minAge,Date startDate,Date endDate);
 }

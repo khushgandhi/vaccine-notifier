@@ -29,7 +29,7 @@ public class SubscriberService {
 	public SubscriberResponse addSubscriber(Subscriber sub) throws Exception {
 		if (sub != null && validateSubscriber(sub)) {
 			sub.setIsActive(true);
-			
+			subscriberRepo.save(sub);
 			try {
 			
 				emailService.sentMailWhenSubscribed(sub.getEmailId(), WELCOME_SUB, MailTemplate.WELCOME_SUBSCRIBER,sub);

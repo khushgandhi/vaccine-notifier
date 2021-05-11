@@ -8,6 +8,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +19,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -80,6 +86,9 @@ public class VaccineNotifierSchedular {
 	@Autowired
 	EmailService emailService;
 	
+	@Autowired
+    private JavaMailSender mailSender;
+	
 	private static String SLOTS_AVAILABLE_SUB = "Hurry vaccination slots are available near you!!";
 
 	@Scheduled(cron = "${cron.expression}")
@@ -114,22 +123,28 @@ public class VaccineNotifierSchedular {
 				if (!CollectionUtils.isEmpty(centers)) {
 					int size = centers.size();
 					System.out.println(districtId + " " + minAge + " " + size);
-					Set<Subscriber> subscribers = subscriberRepository.findValidSubscribers(districtId, minAge, startDate, endDate);
+					List<Subscriber> subscribers = subscriberRepository.findValidSubscribers(districtId, minAge, startDate, endDate);
 					if (!CollectionUtils.isEmpty(subscribers)) {
+						
+					    List<String> bcc = new ArrayList<String>();
+						
 						subscribers.forEach(subscriber -> {
-                             try {
-								this.emailService.sentMailWhenCenterFound(subscriber.getEmailId(),SLOTS_AVAILABLE_SUB,MailTemplate.getSlotsAvailableMsg(size, getSlotAvailableUrl(subscriber)),subscriber);
-							} catch (Exception ex) {
-								System.out.println("Exception while sending mail to "+subscriber.getEmailId());
-								System.out.println(ex);
-							}
-
+                            bcc.add(subscriber.getEmailId());
                             subscriber.setLastNotifiedAt(new Date());
    							subscriberRepository.save(subscriber);
-							
 						});
 						
+						try {
+							MimeMessage	mimeMessage = createMimeMsg(MailTemplate.getSlotsAvailableMsg(size, getSlotAvailableUrl(subscribers.get(0).getDistrictId(),subscribers.get(0).getStateId(),subscribers.get(0).getMinAge())), SLOTS_AVAILABLE_SUB, bcc);
+							emailService.sentMailWhenCenterFound(mimeMessage);
+						} catch (MessagingException e) {
+							System.out.println("Can't create email message!!");
+							e.printStackTrace();
+						}
+						
 					}
+					
+				
 				}
 
 			});
@@ -226,14 +241,13 @@ public class VaccineNotifierSchedular {
 		cal.set(Calendar.DAY_OF_MONTH, 1);
 		return cal.getTime();
 	}
-	private String getSlotAvailableUrl(Subscriber sub)
+	private String getSlotAvailableUrl(Long districtId,Long stateId,Integer minAge)
 	{
 	
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(vaccineNotifierUrl)
-				.queryParam("districtId", sub.getDistrictId())
-				.queryParam("stateId",sub.getStateId())
-				.queryParam("minAge", sub.getMinAge());
-		
+				.queryParam("districtId", districtId)
+				.queryParam("stateId",stateId)
+				.queryParam("minAge", minAge);
          
 		return builder.toUriString();
 	}
@@ -245,5 +259,21 @@ public class VaccineNotifierSchedular {
 		int hr = cal.get(Calendar.HOUR_OF_DAY);
 		
 	    return hr<7;
+	}
+	
+	private MimeMessage createMimeMsg(String body,String subject,List<String> bccList) throws MessagingException
+	{
+		MimeMessage mimeMessage = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+		helper.setText(body, true);
+		
+		helper.setSubject(subject);
+		
+		String[] bcc = new String[bccList.size()];
+		bcc = bccList.toArray(bcc);
+		
+		helper.setBcc(bcc);
+		
+		return mimeMessage;
 	}
 }
