@@ -112,7 +112,7 @@ public class VaccineNotifierSchedular {
 				List<Center> centers = new ArrayList<>();
 				
 				try {
-					centers = VaccineNotifierService.getNextAvailableSlots(districtId, minAge);
+					centers = VaccineNotifierService.getNextAvailableSlots(districtId, minAge,false);
 				} catch (URISyntaxException e) {
 					System.out.println(
 							"getNextAvailableSlots failed for district-:" + districtId + ",ageSlot-:" + minAge);
@@ -142,6 +142,13 @@ public class VaccineNotifierSchedular {
 							e.printStackTrace();
 						}
 						
+						try {
+							System.out.println("calm down for 10 secs....");
+							Thread.sleep(10000);
+							System.out.println("Start for next iteration..");
+						} catch (InterruptedException ex) {
+							System.out.println(ex);
+						}
 					}
 					
 				

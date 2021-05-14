@@ -46,24 +46,24 @@ public class VaccineNotifierService {
 	@Autowired
 	CacheRepository cacheRepo;
 	
-	public List<Center> getNextAvailableSlots(Long districtId,Integer minAge) throws URISyntaxException
+	public List<Center> getNextAvailableSlots(Long districtId,Integer minAge,boolean lookupCache) throws URISyntaxException
 	{
 		String ageKey = districtId.toString()+"_"+minAge;
-		if(this.cacheRepo.contains(ageKey))
+		if(lookupCache && this.cacheRepo.contains(ageKey))
 		{
 			return this.cacheRepo.find(ageKey);
 		}
 		
 		Map<String,Center> centersMap = new LinkedHashMap<>();
 		
-		for(int i=0;i<8;i++)
+		for(int i=0;i<4;i++)
 		{
 			String date = getDateWithOffset(i*7);
 			
 			String dateKey = districtId.toString()+"_"+date;
 			List<Center> allCenters = new ArrayList<>();
 			
-			if(this.cacheRepo.contains(dateKey))
+			if(lookupCache && this.cacheRepo.contains(dateKey))
 			{
 				allCenters = this.cacheRepo.find(dateKey);
 			}
