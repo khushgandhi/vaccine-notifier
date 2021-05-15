@@ -46,30 +46,31 @@ public class VaccineNotifierService {
 	@Autowired
 	CacheRepository cacheRepo;
 	
-	public List<Center> getNextAvailableSlots(Long districtId,Integer minAge,boolean lookupCache) throws URISyntaxException
+
+	public List<Center> getNextAvailableSlots(Long districtId,Integer minAge,boolean isCron) throws URISyntaxException
 	{
 		String ageKey = districtId.toString()+"_"+minAge;
-		if(lookupCache && this.cacheRepo.contains(ageKey))
+		if( this.cacheRepo.contains(ageKey))
 		{
 			return this.cacheRepo.find(ageKey);
 		}
 		
 		Map<String,Center> centersMap = new LinkedHashMap<>();
 		
-		for(int i=0;i<4;i++)
+		for(int i=0;i<2;i++)
 		{
 			String date = getDateWithOffset(i*7);
 			
 			String dateKey = districtId.toString()+"_"+date;
 			List<Center> allCenters = new ArrayList<>();
 			
-			if(lookupCache && this.cacheRepo.contains(dateKey))
+			if( this.cacheRepo.contains(dateKey))
 			{
 				allCenters = this.cacheRepo.find(dateKey);
 			}
 			else
 			{
-				allCenters = this.getCenters(districtId,date);
+				allCenters = this.getCenters(districtId,date,isCron);
 				this.cacheRepo.save(dateKey, allCenters);
 			}
 			
@@ -116,7 +117,7 @@ public class VaccineNotifierService {
 	}
 
 	
-	private List<Center> getCenters(Long districtId,String date) throws URISyntaxException
+	private List<Center> getCenters(Long districtId,String date,boolean isCron) throws URISyntaxException
 	{
 		RestTemplate restTemplate = new RestTemplate();
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(cowinCenterByDistrictUrl)
@@ -126,10 +127,22 @@ public class VaccineNotifierService {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Content-type", "application/json");
 		headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36 Edg/90.0.818.51");
+		headers.set("origin", "https://www.cowin.gov.in");
 		
 		HttpEntity<Object> request = new HttpEntity<>(headers);
 
 		String uri = builder.toUriString();
+		
+		if(isCron)
+		{
+			try {
+				System.out.println("calm down for 2 secs....");
+				Thread.sleep(2000);
+				System.out.println("Start for next iteration..");
+			} catch (InterruptedException ex) {
+				System.out.println(ex);
+			}
+		}
 		
 		System.out.println("Calling cowin api -: "+uri);
 		
@@ -150,6 +163,7 @@ public class VaccineNotifierService {
 			System.out.println("Can't fetch available centers for districtId "+districtId+" On date "+date);
 			System.out.println(ex);
 		}
+		
 		
 		
 	  return new ArrayList<Center>();	

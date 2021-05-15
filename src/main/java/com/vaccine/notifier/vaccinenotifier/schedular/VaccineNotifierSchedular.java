@@ -7,14 +7,17 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -91,8 +94,11 @@ public class VaccineNotifierSchedular {
 	
 	private static String SLOTS_AVAILABLE_SUB = "Hurry vaccination slots are available near you!!";
 
+	private int count =0;
+	
 	@Scheduled(cron = "${cron.expression}")
 	public void findAvailableCenters() throws ParseException {
+		count =0 ;
 		if(isNightTime())
 		{
 			System.out.println("Cant't send email at night time -:"+ new Date());
@@ -104,7 +110,11 @@ public class VaccineNotifierSchedular {
 		
 		Set<DistinctDistrictAge> districtAgePairs = subscriberRepository.findDistinctDistricts(startDate,endDate);
 
+		System.out.println("Job started at -: "+new Date());
 		if (!CollectionUtils.isEmpty(districtAgePairs)) {
+			
+			System.out.println("Total distinct district-age pairs are.."+districtAgePairs.size()+" At-: "+new Date());
+			
 			districtAgePairs.forEach(districAgePair -> {
 				Long districtId = districAgePair.getDistrictId();
 				Integer minAge = districAgePair.getMinAge();
@@ -112,7 +122,8 @@ public class VaccineNotifierSchedular {
 				List<Center> centers = new ArrayList<>();
 				
 				try {
-					centers = VaccineNotifierService.getNextAvailableSlots(districtId, minAge,false);
+					count+=4;
+					centers = VaccineNotifierService.getNextAvailableSlots(districtId, minAge,true);
 				} catch (URISyntaxException e) {
 					System.out.println(
 							"getNextAvailableSlots failed for district-:" + districtId + ",ageSlot-:" + minAge);
@@ -123,15 +134,18 @@ public class VaccineNotifierSchedular {
 				if (!CollectionUtils.isEmpty(centers)) {
 					int size = centers.size();
 					System.out.println(districtId + " " + minAge + " " + size);
-					List<Subscriber> subscribers = subscriberRepository.findValidSubscribers(districtId, minAge, startDate, endDate);
-					if (!CollectionUtils.isEmpty(subscribers)) {
+					
+					Pageable pageRequest = PageRequest.of(0, 90);
+					
+					Page<Subscriber> subscribersPage = subscriberRepository.findValidSubscribers(districtId, minAge, startDate, endDate,pageRequest);
+					while (!subscribersPage.isEmpty()) {
 						
 					    List<String> bcc = new ArrayList<String>();
 						
+						List<Subscriber> subscribers = subscribersPage.getContent();
+						
 						subscribers.forEach(subscriber -> {
                             bcc.add(subscriber.getEmailId());
-                            subscriber.setLastNotifiedAt(new Date());
-   							subscriberRepository.save(subscriber);
 						});
 						
 						try {
@@ -142,19 +156,29 @@ public class VaccineNotifierSchedular {
 							e.printStackTrace();
 						}
 						
-						try {
-							System.out.println("calm down for 10 secs....");
-							Thread.sleep(10000);
-							System.out.println("Start for next iteration..");
-						} catch (InterruptedException ex) {
-							System.out.println(ex);
+						subscribers.forEach(subscriber ->{
+							subscriber.setLastNotifiedAt(new Date());
+   							subscriberRepository.save(subscriber);
+						});
+						
+						if(subscribersPage.hasNext())
+						{
+							pageRequest=  subscribersPage.nextPageable();
+							subscribersPage = subscriberRepository.findValidSubscribers(districtId, minAge, startDate, endDate,pageRequest);
 						}
+						else
+						{
+							subscribersPage = Page.empty();
+						}
+						
 					}
 					
 				
 				}
 
 			});
+			
+			System.out.println("Job completed at "+new Date()+" with count -:"+count);
 		}
 
 	}

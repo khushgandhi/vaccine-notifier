@@ -33,7 +33,7 @@ public class VaccineNotifierController {
 	@RequestMapping(value="/getNextSlot",method={RequestMethod.OPTIONS,RequestMethod.GET})
 	public List<Center> getNextAvailableSlots(@RequestParam(name = "district_id") Long districtId,@RequestParam Integer minAge) throws URISyntaxException
 	{
-		return this.vaccineNotifierService.getNextAvailableSlots(districtId, minAge,true);
+		return this.vaccineNotifierService.getNextAvailableSlots(districtId, minAge,false);
 	}
 	
 	@RequestMapping(value="/cron",method={RequestMethod.OPTIONS,RequestMethod.GET})
