@@ -78,7 +78,7 @@ public class VaccineNotifierService {
 				
 				List<Session> filterdSessions = center.getSessions().stream().filter(session->
 				{
-					if(session.getAvailableCapacity()>0 && session.getMinAgeLimit()<=minAge)
+					if(session.getAvailableCapacity()>0 && session.getMinAgeLimit() == minAge)
 					{
 						return true;
 					}
